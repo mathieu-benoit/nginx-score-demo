@@ -1,5 +1,7 @@
 .score-compose/
 compose.yaml
+compose.override.yaml
 
 .score-k8s/
 manifests.yaml
+deployment-patch.yaml

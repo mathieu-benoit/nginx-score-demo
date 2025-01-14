@@ -8,12 +8,18 @@ containers:
       - target: /usr/share/nginx/html/index.html
         mode: "0644"
         source: website/index.html
+    volumes:
+    - source: ${resources.tmp}
+      target: /tmp
+      readOnly: false
 service:
   ports:
     tcp:
       port: 8080
       targetPort: 8080
 resources:
+  tmp:
+    type: volume
   hpa:
     type: horizontal-pod-autoscaler
     params: # optional
