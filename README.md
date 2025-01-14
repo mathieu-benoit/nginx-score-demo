@@ -28,13 +28,16 @@ score-k8s init \
 
 score-k8s generate score.yaml \
     --image nginxinc/nginx-unprivileged:alpine-slim \
-    --patch-manifests 'Deployment/*/spec.template.spec.securityContext={"fsGroup":65532,"runAsGroup":65532,"runAsNonRoot":true,"runAsUser":65532,"seccompProfile":{"type":"RuntimeDefault"}}'
+    --patch-manifests 'Deployment/*/spec.template.spec.securityContext={"fsGroup":65532,"runAsGroup":65532,"runAsNonRoot":true,"runAsUser":65532,"seccompProfile":{"type":"RuntimeDefault"}}' \
+    --patch-manifests 'Deployment/*/spec.template.spec.serviceAccount=webapp'
 
 echo '{"spec":{"template":{"spec":{"containers":[{"name":"webapp","securityContext":{"allowPrivilegeEscalation":false,"privileged": false,"readOnlyRootFilesystem": true,"capabilities":{"drop":["ALL"]}}}]}}}}' > deployment-patch.yaml
+echo '{"apiVersion":"v1","kind":"ServiceAccount","metadata":{"name":"webapp"}}' | yq e -P > serviceaccount.yaml
 
 NAMESPACE=default
-kubectl apply -n $NAMESPACE -f manifests.yaml 
+kubectl apply -n $NAMESPACE -f manifests.yaml
 kubectl patch -n $NAMESPACE deployment nginx --patch-file deployment-patch.yaml
+kubectl apply -n $NAMESPACE -f serviceaccount.yaml
 
 curl $(score-k8s resources get-outputs dns.default#nginx.dns --format '{{ .host }}')
 ```

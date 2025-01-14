@@ -5,3 +5,4 @@ compose.override.yaml
 .score-k8s/
 manifests.yaml
 deployment-patch.yaml
+serviceaccount.yaml
