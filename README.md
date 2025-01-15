@@ -1,5 +1,12 @@
 # nginx-score-demo
 
+A Developer authors and maintains their files in the [`website`](./website/) folder, their [`Dockerfile`](Dockerfile) and the [`score.yaml`](score.yaml) file.
+
+Then, they have 
+- [Deploy with `score-compose`](#deploy-with-score-compose)
+- [Deploy with `score-k8s`](#deploy-with-score-k8s)
+- [Deploy with `humctl`](#deploy-with-humctl)
+
 ## Deploy with `score-compose`
 
 Initialize the local `score-compose` workspace:
@@ -67,4 +74,27 @@ kubectl apply -n $NAMESPACE -f serviceaccount.yaml
 Test the deployed Workload:
 ```bash
 curl $(score-k8s resources get-outputs dns.default#nginx.dns --format '{{ .host }}')
+```
+
+## Deploy with `humctl`
+
+Deploy the Score file in Humanitec:
+```bash
+CONTAINER_IMAGE_IN_REGISTRY=FIXME
+
+humctl score deploy -f score.yaml \
+    --app ${APP} \
+    --env ${ENV} \
+    --image ${CONTAINER_IMAGE_IN_REGISTRY}
+```
+
+_This is assuming that Platform Engineers have registered the following [`volume`](https://developer.humanitec.com/examples/resource-definitions?capability=volumes), [`horizontal-pod-autoscaler`](https://developer.humanitec.com/examples/resource-definitions?capability=horizontal-pod-autoscaler) and [`workload` with `securityContext`](https://developer.humanitec.com/examples/resource-definitions/template-driver/security-context/) in Humanitec._
+
+Test the deployed Workload:
+```bash
+humctl get active-resources \
+    --app ${APP} \
+    --env ${ENV} \
+    -o json \
+    | jq -r '. | map(. | select(.metadata.type == "dns")) | map((.metadata.res_id | split(".") | .[1]) + ": [" + .status.resource.host + "](https://" + .status.resource.host + ")") | join("\n")'
 ```
