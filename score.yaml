@@ -4,10 +4,6 @@ metadata:
 containers:
   webapp:
     image: .
-    files:
-      - target: /usr/share/nginx/html/index.html
-        mode: "0644"
-        source: website/index.html
     volumes:
     - source: ${resources.tmp}
       target: /tmp

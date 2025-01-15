@@ -2,7 +2,7 @@
 
 A Developer authors and maintains their files in the [`website`](./website/) folder, their [`Dockerfile`](Dockerfile) and the [`score.yaml`](score.yaml) file.
 
-Then, they have 
+Then, they can deploy their `score.yaml` file with three options:
 - [Deploy with `score-compose`](#deploy-with-score-compose)
 - [Deploy with `score-k8s`](#deploy-with-score-k8s)
 - [Deploy with `humctl`](#deploy-with-humctl)
@@ -19,7 +19,7 @@ score-compose init \
 Generate the Docker Compose files:
 ```bash
 score-compose generate score.yaml \
-    --image nginxinc/nginx-unprivileged:alpine-slim
+    --build 'webapp={"context":"."}' \
 
 echo '{"services":{"nginx-webapp":{"read_only":"true","user":"65532","cap_drop":["ALL"]}}}' | yq e -P > compose.override.yaml
 ```
@@ -39,6 +39,8 @@ curl $(score-compose resources get-outputs dns.default#nginx.dns --format '{{ .h
 Prepare the cluster:
 ```bash
 ./scripts/setup-kind-cluster.sh
+
+CONTAINER_IMAGE=nginx-score-demo-nginx-webapp:latest
 kind load docker-image ${CONTAINER_IMAGE}
 
 NAMESPACE=default
@@ -56,7 +58,7 @@ score-k8s init \
 Generate the Kubernetes manifests:
 ```bash
 score-k8s generate score.yaml \
-    --image nginxinc/nginx-unprivileged:alpine-slim \
+    --image ${CONTAINER_IMAGE} \
     --patch-manifests 'Deployment/*/spec.template.spec.securityContext={"fsGroup":65532,"runAsGroup":65532,"runAsNonRoot":true,"runAsUser":65532,"seccompProfile":{"type":"RuntimeDefault"}}' \
     --patch-manifests 'Deployment/*/spec.template.spec.serviceAccount=webapp'
 
@@ -88,7 +90,7 @@ humctl score deploy -f score.yaml \
     --image ${CONTAINER_IMAGE_IN_REGISTRY}
 ```
 
-_This is assuming that Platform Engineers have registered the following [`volume`](https://developer.humanitec.com/examples/resource-definitions?capability=volumes), [`horizontal-pod-autoscaler`](https://developer.humanitec.com/examples/resource-definitions?capability=horizontal-pod-autoscaler) and [`workload` with `securityContext`](https://developer.humanitec.com/examples/resource-definitions/template-driver/security-context/) in Humanitec._
+_Note: this is assuming that Platform Engineers have registered the following [`volume`](https://developer.humanitec.com/examples/resource-definitions?capability=volumes), [`horizontal-pod-autoscaler`](https://developer.humanitec.com/examples/resource-definitions?capability=horizontal-pod-autoscaler) and [`workload` with `securityContext`](https://developer.humanitec.com/examples/resource-definitions/template-driver/security-context/) in Humanitec._
 
 Test the deployed Workload:
 ```bash
