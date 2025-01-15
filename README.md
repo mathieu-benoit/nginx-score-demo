@@ -59,6 +59,7 @@ Generate the Kubernetes manifests:
 ```bash
 score-k8s generate score.yaml \
     --image ${CONTAINER_IMAGE} \
+    --patch-manifests 'Deployment/*/spec.template.spec.automountServiceAccountToken=false' \
     --patch-manifests 'Deployment/*/spec.template.spec.securityContext={"fsGroup":65532,"runAsGroup":65532,"runAsNonRoot":true,"runAsUser":65532,"seccompProfile":{"type":"RuntimeDefault"}}' \
     --patch-manifests 'Deployment/*/spec.template.spec.serviceAccount=webapp'
 
