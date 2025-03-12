@@ -13,7 +13,7 @@ Initialize the local `score-compose` workspace:
 ```bash
 score-compose init \
     --no-sample \
-    --provisioners https://raw.githubusercontent.com/score-spec/community-provisioners/refs/heads/main/score-compose/00-hpa.provisioners.yaml
+    --provisioners https://raw.githubusercontent.com/score-spec/community-provisioners/refs/heads/main/score-compose/10-hpa.provisioners.yaml
 ```
 
 Generate the Docker Compose files:
@@ -52,7 +52,7 @@ Initialize the local `score-k8s` workspace:
 ```bash
 score-k8s init \
     --no-sample \
-    --provisioners https://raw.githubusercontent.com/score-spec/community-provisioners/refs/heads/main/score-k8s/00-hpa.provisioners.yaml
+    --provisioners https://raw.githubusercontent.com/score-spec/community-provisioners/refs/heads/main/score-k8s/10-hpa.provisioners.yaml
 ```
 
 Generate the Kubernetes manifests:
