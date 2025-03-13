@@ -13,15 +13,14 @@ Initialize the local `score-compose` workspace:
 ```bash
 score-compose init \
     --no-sample \
-    --provisioners https://raw.githubusercontent.com/score-spec/community-provisioners/refs/heads/main/score-compose/10-hpa.provisioners.yaml
+    --provisioners https://raw.githubusercontent.com/score-spec/community-provisioners/refs/heads/main/score-compose/10-hpa.provisioners.yaml \
+    --patch-templates patch-templates/score-compose-unprivileged.tpl
 ```
 
 Generate the Docker Compose files:
 ```bash
 score-compose generate score.yaml \
-    --build 'webapp={"context":"."}' \
-
-echo '{"services":{"nginx-webapp":{"read_only":"true","user":"65532","cap_drop":["ALL"]}}}' | yq e -P > compose.override.yaml
+    --build 'webapp={"context":"."}'
 ```
 
 Deploy the Docker Compose files:
