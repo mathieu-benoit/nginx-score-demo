@@ -51,7 +51,8 @@ Initialize the local `score-k8s` workspace:
 ```bash
 score-k8s init \
     --no-sample \
-    --provisioners https://raw.githubusercontent.com/score-spec/community-provisioners/refs/heads/main/score-k8s/10-hpa.provisioners.yaml
+    --provisioners https://raw.githubusercontent.com/score-spec/community-provisioners/refs/heads/main/score-k8s/10-hpa.provisioners.yaml \
+    --patch-templates patch-templates/score-k8s-service-account.tpl
 ```
 
 Generate the Kubernetes manifests:
@@ -59,11 +60,9 @@ Generate the Kubernetes manifests:
 score-k8s generate score.yaml \
     --image ${CONTAINER_IMAGE} \
     --patch-manifests 'Deployment/*/spec.template.spec.automountServiceAccountToken=false' \
-    --patch-manifests 'Deployment/*/spec.template.spec.securityContext={"fsGroup":65532,"runAsGroup":65532,"runAsNonRoot":true,"runAsUser":65532,"seccompProfile":{"type":"RuntimeDefault"}}' \
-    --patch-manifests 'Deployment/*/spec.template.spec.serviceAccount=webapp'
+    --patch-manifests 'Deployment/*/spec.template.spec.securityContext={"fsGroup":65532,"runAsGroup":65532,"runAsNonRoot":true,"runAsUser":65532,"seccompProfile":{"type":"RuntimeDefault"}}'
 
 echo '{"spec":{"template":{"spec":{"containers":[{"name":"webapp","securityContext":{"allowPrivilegeEscalation":false,"privileged": false,"readOnlyRootFilesystem": true,"capabilities":{"drop":["ALL"]}}}]}}}}' > deployment-patch.yaml
-echo '{"apiVersion":"v1","kind":"ServiceAccount","metadata":{"name":"webapp"}}' | yq e -P > serviceaccount.yaml
 ```
 
 Deploy the Kubernetes manifests:
