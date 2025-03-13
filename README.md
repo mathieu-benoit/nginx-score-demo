@@ -60,14 +60,11 @@ Generate the Kubernetes manifests:
 ```bash
 score-k8s generate score.yaml \
     --image ${CONTAINER_IMAGE}
-
-echo '{"spec":{"template":{"spec":{"containers":[{"name":"webapp","securityContext":{"allowPrivilegeEscalation":false,"privileged": false,"readOnlyRootFilesystem": true,"capabilities":{"drop":["ALL"]}}}]}}}}' > deployment-patch.yaml
 ```
 
 Deploy the Kubernetes manifests:
 ```bash
 kubectl apply -n $NAMESPACE -f manifests.yaml
-kubectl patch -n $NAMESPACE deployment nginx --patch-file deployment-patch.yaml
 ```
 
 Test the deployed Workload:
