@@ -13,15 +13,14 @@ Initialize the local `score-compose` workspace:
 ```bash
 score-compose init \
     --no-sample \
-    --provisioners https://raw.githubusercontent.com/score-spec/community-provisioners/refs/heads/main/score-compose/10-hpa.provisioners.yaml
+    --provisioners https://raw.githubusercontent.com/score-spec/community-provisioners/refs/heads/main/score-compose/10-hpa.provisioners.yaml \
+    --patch-templates https://raw.githubusercontent.com/score-spec/community-patchers/refs/heads/main/score-compose/unprivileged.tpl
 ```
 
 Generate the Docker Compose files:
 ```bash
 score-compose generate score.yaml \
-    --build 'webapp={"context":"."}' \
-
-echo '{"services":{"nginx-webapp":{"read_only":"true","user":"65532","cap_drop":["ALL"]}}}' | yq e -P > compose.override.yaml
+    --build 'webapp={"context":"."}'
 ```
 
 Deploy the Docker Compose files:
@@ -52,26 +51,20 @@ Initialize the local `score-k8s` workspace:
 ```bash
 score-k8s init \
     --no-sample \
-    --provisioners https://raw.githubusercontent.com/score-spec/community-provisioners/refs/heads/main/score-k8s/10-hpa.provisioners.yaml
+    --provisioners https://raw.githubusercontent.com/score-spec/community-provisioners/refs/heads/main/score-k8s/10-hpa.provisioners.yaml \
+    --patch-templates https://raw.githubusercontent.com/score-spec/community-patchers/refs/heads/main/score-k8s/service-account.tpl \
+    --patch-templates https://raw.githubusercontent.com/score-spec/community-patchers/refs/heads/main/score-k8s/unprivileged.tpl
 ```
 
 Generate the Kubernetes manifests:
 ```bash
 score-k8s generate score.yaml \
-    --image ${CONTAINER_IMAGE} \
-    --patch-manifests 'Deployment/*/spec.template.spec.automountServiceAccountToken=false' \
-    --patch-manifests 'Deployment/*/spec.template.spec.securityContext={"fsGroup":65532,"runAsGroup":65532,"runAsNonRoot":true,"runAsUser":65532,"seccompProfile":{"type":"RuntimeDefault"}}' \
-    --patch-manifests 'Deployment/*/spec.template.spec.serviceAccount=webapp'
-
-echo '{"spec":{"template":{"spec":{"containers":[{"name":"webapp","securityContext":{"allowPrivilegeEscalation":false,"privileged": false,"readOnlyRootFilesystem": true,"capabilities":{"drop":["ALL"]}}}]}}}}' > deployment-patch.yaml
-echo '{"apiVersion":"v1","kind":"ServiceAccount","metadata":{"name":"webapp"}}' | yq e -P > serviceaccount.yaml
+    --image ${CONTAINER_IMAGE}
 ```
 
 Deploy the Kubernetes manifests:
 ```bash
 kubectl apply -n $NAMESPACE -f manifests.yaml
-kubectl patch -n $NAMESPACE deployment nginx --patch-file deployment-patch.yaml
-kubectl apply -n $NAMESPACE -f serviceaccount.yaml
 ```
 
 Test the deployed Workload:
