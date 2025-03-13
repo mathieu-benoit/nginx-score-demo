@@ -52,7 +52,8 @@ Initialize the local `score-k8s` workspace:
 score-k8s init \
     --no-sample \
     --provisioners https://raw.githubusercontent.com/score-spec/community-provisioners/refs/heads/main/score-k8s/10-hpa.provisioners.yaml \
-    --patch-templates https://raw.githubusercontent.com/score-spec/community-patchers/refs/heads/main/score-k8s/service-account.tpl
+    --patch-templates https://raw.githubusercontent.com/score-spec/community-patchers/refs/heads/main/score-k8s/service-account.tpl \
+    --patch-templates https://raw.githubusercontent.com/score-spec/community-patchers/refs/heads/main/score-k8s/unprivileged.tpl
 ```
 
 Generate the Kubernetes manifests:
