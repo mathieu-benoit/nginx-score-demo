@@ -1,5 +1,7 @@
 # nginx-score-demo
 
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/mathieu-benoit/nginx-score-demo)
+
 A Developer authors and maintains their files in the [`website`](./website/) folder, their [`Dockerfile`](Dockerfile) and the [`score.yaml`](score.yaml) file.
 
 Then, they can deploy their `score.yaml` file with three options:
